@@ -1,19 +1,18 @@
+import { observer } from "mobx-react-lite";
 import React, { ChangeEvent, useState } from "react";
-import { Segment, Form, Button } from "semantic-ui-react";
-import { Activity } from "../../../app/models/activity";
+import { Button, Form, Segment } from "semantic-ui-react";
+import { useStore } from "../../../app/stores/store";
 
-interface Props {
-  closeForm: () => void;
-  activity: Activity | undefined;
-  submitting: boolean;
-  CreateOrEditActivity: (activity: Activity) => void;
-}
-const ActivityForm = ({
-  closeForm,
-  activity: selectedActivity,
-  CreateOrEditActivity,
-  submitting,
-}: Props) => {
+export default observer(function ActivityForm() {
+  const { activityStore } = useStore();
+  const {
+    selectedActivity,
+    closeForm,
+    createActivity,
+    updateActivity,
+    loading,
+  } = activityStore;
+
   const initialState = selectedActivity ?? {
     id: "",
     title: "",
@@ -24,10 +23,10 @@ const ActivityForm = ({
     venue: "",
   };
 
-  const [activity, setActivity] = useState<Activity>(initialState);
+  const [activity, setActivity] = useState(initialState);
 
   function handleSubmit() {
-    CreateOrEditActivity(activity);
+    activity.id ? updateActivity(activity) : createActivity(activity);
   }
 
   function handleInputChange(
@@ -36,58 +35,61 @@ const ActivityForm = ({
     const { name, value } = event.target;
     setActivity({ ...activity, [name]: value });
   }
+
   return (
-    <Segment>
+    <Segment clearing>
       <Form onSubmit={handleSubmit} autoComplete="off">
         <Form.Input
+          placeholder="Title"
           value={activity.title}
           name="title"
           onChange={handleInputChange}
-          placeholder="Title"
         />
         <Form.TextArea
+          placeholder="Description"
           value={activity.description}
           name="description"
-          placeholder="Description"
           onChange={handleInputChange}
         />
         <Form.Input
+          placeholder="Category"
           value={activity.category}
           name="category"
           onChange={handleInputChange}
-          placeholder="Category"
         />
         <Form.Input
+          type="date"
+          placeholder="Date"
           value={activity.date}
           name="date"
           onChange={handleInputChange}
-          placeholder="Date"
-          type="date"
         />
         <Form.Input
+          placeholder="City"
           value={activity.city}
           name="city"
           onChange={handleInputChange}
-          placeholder="City"
         />
         <Form.Input
+          placeholder="Venue"
           value={activity.venue}
           name="venue"
           onChange={handleInputChange}
-          placeholder="Venue"
         />
-
         <Button
-          loading={submitting}
-          float="right"
+          loading={loading}
+          floated="right"
           positive
           type="submit"
           content="Submit"
         />
-        <Button onClick={closeForm} float="right" positive content="Cancel" />
+        <Button
+          onClick={closeForm}
+          floated="right"
+          type="button"
+          content="Cancel"
+        />
       </Form>
     </Segment>
   );
-};
-
-export default ActivityForm;
+});
