@@ -3,20 +3,31 @@ import { Button, Icon, Item, Segment } from "semantic-ui-react";
 // import { useStore } from "../../../app/stores/store";
 import { Activity } from "../../../app/models/activity";
 import { Link } from "react-router-dom";
+import { SyntheticEvent, useState } from "react";
 
 interface Props {
   activities: Activity[];
   selectActivity: (id: string) => void;
   deleteActivity: (id: string) => void;
+  submitting: boolean;
 }
 
 export default (function ActivityList({
   activities,
   selectActivity,
   deleteActivity,
+  submitting,
 }: Props) {
   //   const { activityStore } = useStore();
   //   const { groupedActivities } = activityStore;
+  const [target, setTarget] = useState("");
+  function handleActivityDelete(
+    event: SyntheticEvent<HTMLButtonElement>,
+    id: string
+  ) {
+    setTarget(event.currentTarget.name);
+    deleteActivity(id);
+  }
 
   return (
     <>
@@ -55,10 +66,14 @@ export default (function ActivityList({
                   <Button
                     // as={Link}
                     // to={`/activities/${activity.id}`}
+                    name={activity.id}
+                    loading={submitting && target === activity.id}
                     color="red"
                     floated="right"
                     content="Delete"
-                    onClick={() => deleteActivity(activity.id)}
+                    onClick={(event) =>
+                      handleActivityDelete(event, activity.id)
+                    }
                   />
                 </Item.Group>
               </Segment>

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, Fragment } from "react";
-import axios from "axios";
 import { Activity } from "../models/activity";
 import { v4 as uuid } from "uuid";
 
@@ -7,6 +6,8 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import NavBar from "./NavBar";
 import { Container } from "semantic-ui-react";
 import ActivityDashboard from "../../features/activities/dashboard/ActivityDashboard";
+import agent from "../api/agent";
+import LoadingComponent from "./LoadingComponent";
 
 function App() {
   return (
@@ -25,14 +26,22 @@ const HomePage = () => {
   >(undefined);
 
   const [editMode, setEditMode] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     async function GetActivities() {
       try {
-        const response = await axios.get<Activity[]>(
-          "http://localhost:5000/api/activities"
-        );
-        setActivities(response.data);
+        const response = await agent.Activities.list();
+        let activities: Activity[] = [];
+        response.forEach((activity) => {
+          activity.date = new Date(activity.date);
+          let date = new Date(activity.date);
+
+          activities.push(activity);
+        });
+        setActivities(activities);
+        setLoading(false);
       } catch (error) {
         console.log(error);
       }
@@ -56,22 +65,47 @@ const HomePage = () => {
     setEditMode(false);
   }
 
-  function handleCreateOrEditActivity(activity: Activity) {
-    activity.id
-      ? setActivities([
+  async function handleCreateOrEditActivity(activity: Activity) {
+    setSubmitting(true);
+    console.log(activity);
+    activity.date = new Date(activity.date);
+    if (activity.id) {
+      try {
+        await agent.Activities.update(activity);
+        setActivities([
           activity,
           ...activities.filter((x) => x.id !== activity.id),
-        ])
-      : setActivities([{ ...activity, id: uuid() }, ...activities]);
+        ]);
+      } catch (error) {
+        console.log("Update error: ", error);
+      }
+    } else {
+      try {
+        activity.id = uuid();
+        await agent.Activities.create(activity);
+        setActivities([activity, ...activities]);
+      } catch (error) {}
+    }
 
     setEditMode(false);
     setSelectedActivity(activity);
+    setSubmitting(false);
   }
 
-  function handleDeleteActivity(id: string) {
+  async function handleDeleteActivity(id: string) {
+    setSubmitting(true);
+    try {
+      await agent.Activities.delete(id);
+      setActivities([...activities.filter((x) => x.id !== id)]);
+      setSubmitting(false);
+    } catch (error) {
+      console.log("Update error: ", error);
+    }
     setActivities([...activities.filter((x) => x.id !== id)]);
   }
-
+  if (loading) {
+    return <LoadingComponent content="Loading app" />;
+  }
   return (
     <>
       <NavBar openForm={handleFormOpen} />
@@ -86,6 +120,7 @@ const HomePage = () => {
           closeForm={handleFormClose}
           CreateOrEditActivity={handleCreateOrEditActivity}
           deleteActivity={handleDeleteActivity}
+          submitting={submitting}
         />
       </Container>
     </>
