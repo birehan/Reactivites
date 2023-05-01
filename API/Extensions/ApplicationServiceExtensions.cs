@@ -4,6 +4,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL;
 using MediatR;
 using  Application.Activities;
 using Microsoft.EntityFrameworkCore;
+using FluentValidation.AspNetCore;
+using FluentValidation;
 
 namespace API.Extensions
 {
@@ -28,6 +30,11 @@ namespace API.Extensions
             });
 
             services.AddMediatR(typeof(List.Handler));
+            services.AddFluentValidationAutoValidation();
+                    services.AddValidatorsFromAssemblyContaining<Create>();
+
+            // services.AddValidatorsFromAssemblyContaining<Create>(includeInternalTypes: true);
+            // services.AddValidatorsFromAssemblyContaining<Create>(includeInternalTypes: true);
 
             return services;
         }

@@ -3,6 +3,7 @@ using Persistence;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using API.Extensions;
+using API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
