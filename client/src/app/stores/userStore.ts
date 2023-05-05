@@ -1,8 +1,8 @@
 import { makeAutoObservable, runInAction } from "mobx";
+import { router } from "../routes/Routes";
 import agent from "../api/agent";
 import { User, UserFormValues } from "../models/user";
 import { store } from "./store";
-import { router } from "../routes/Routes";
 
 export default class UserStore {
     user: User | null = null;
@@ -31,7 +31,7 @@ export default class UserStore {
         store.commonStore.setToken(null);
         window.localStorage.removeItem('jwt');
         this.user = null;
-        router.navigate('/'); 
+        router.navigate('/');
     }
 
     getUser = async () => {
