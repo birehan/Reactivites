@@ -6,6 +6,8 @@ using  Application.Activities;
 using Microsoft.EntityFrameworkCore;
 using FluentValidation.AspNetCore;
 using FluentValidation;
+using Application.Interfaces;
+using Infrastructure.Security;
 
 namespace API.Extensions
 {
@@ -21,6 +23,7 @@ namespace API.Extensions
 
             // dotnet add package Microsoft.EntityFrameworkCore.InMemory
             // using Microsoft.EntityFrameworkCore;
+            
             services.AddDbContext<DataContext>(options =>
                 options.UseNpgsql(config.GetConnectionString("DefaultConnection")));
 
@@ -35,6 +38,10 @@ namespace API.Extensions
 
             // services.AddValidatorsFromAssemblyContaining<Create>(includeInternalTypes: true);
             // services.AddValidatorsFromAssemblyContaining<Create>(includeInternalTypes: true);
+
+
+            services.AddHttpContextAccessor();
+            services.AddScoped<IUserAccessor, UserAccessor>();
 
             return services;
         }
