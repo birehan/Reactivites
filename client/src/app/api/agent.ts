@@ -20,8 +20,6 @@ axios.interceptors.request.use((config) => {
   return config;
 });
 
-
-
 axios.interceptors.response.use(
   async (response) => {
     await sleep(1000);
@@ -72,7 +70,6 @@ axios.interceptors.response.use(
   }
 );
 
-
 const responseBody = <T>(response: AxiosResponse<T>) => response.data;
 
 const requests = {
@@ -114,6 +111,10 @@ const Profiles = {
   deletePhoto: (id: string) => requests.del(`/photos/${id}`),
   updateProfile: (profile: Partial<Profile>) =>
     requests.put(`/profiles`, profile),
+  updateFollowing: (username: string) =>
+    requests.post(`/follow/${username}`, {}),
+  listFollowings: (username: string, predicate: string) =>
+    requests.get<Profile[]>(`/follow/${username}?predicate=${predicate}`),
 };
 
 const agent = {
