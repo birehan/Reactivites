@@ -11,7 +11,7 @@ interface Props {
 export default function PhotoUploadWidget({loading, uploadPhoto}: Props) {
     const [files, setFiles] = useState<any>([]);
     const [cropper, setCropper] = useState<Cropper>();
- 
+
     function onCrop() {
         if (cropper) {
             cropper.getCroppedCanvas().toBlob(blob => uploadPhoto(blob!));

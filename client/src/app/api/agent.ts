@@ -20,6 +20,8 @@ axios.interceptors.request.use((config) => {
   return config;
 });
 
+
+
 axios.interceptors.response.use(
   async (response) => {
     await sleep(1000);
@@ -70,6 +72,7 @@ axios.interceptors.response.use(
   }
 );
 
+
 const responseBody = <T>(response: AxiosResponse<T>) => response.data;
 
 const requests = {
@@ -109,6 +112,8 @@ const Profiles = {
   },
   setMainPhoto: (id: string) => requests.post(`/photos/${id}/setMain`, {}),
   deletePhoto: (id: string) => requests.del(`/photos/${id}`),
+  updateProfile: (profile: Partial<Profile>) =>
+    requests.put(`/profiles`, profile),
 };
 
 const agent = {
